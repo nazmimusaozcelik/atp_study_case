@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volume
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/path/to/mysql-data" # Bu kısım, MySQL verilerinin fiziksel olarak saklanacağı host makinanın yolunu gösterir
+  claimRef:
+    namespace: default
+    name: mysql-data
+    uid: <UID-OF-MYSQL-DATA-PVC>

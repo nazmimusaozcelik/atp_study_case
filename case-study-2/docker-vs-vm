@@ -1,0 +1,29 @@
+Docker ve sanal makineler (VMs) farklı sanallaştırma teknolojileri kullanarak benzer amaçlara hizmet eden iki farklı yaklaşımdır. 
+Docker ve sanal makineler arasındaki temel farklar:
+
+1-) Sanallaştırma Seviyesi:
+
+Docker: Docker, işletim sistemi seviyesinde sanallaştırma yapar. Bir işletim sistemi çekirdeğini paylaşan, ancak ayrı kullanıcı alanlarına sahip hafif konteynerler oluşturur. Bu konteynerler, uygulama ve bağımlılıklarını bir araya getirir ve izole eder.
+Sanal Makineler: Sanal makineler, bir hipervizör (örneğin, VMware, VirtualBox) üzerinde çalışarak donanım seviyesinde sanallaştırma sağlar. Her sanal makine, kendi işletim sistemini ve çekirdeğini barındırır.
+
+2-) Kaynak Kullanımı:
+
+Docker: Docker konteynerleri, paylaşılan bir çekirdek kullanarak daha hafif ve daha hızlı çalışma eğilimindedir. Konteynerler, host işletim sistemi üzerinde çalıştıkları için daha az kaynak tüketirler.
+Sanal Makineler: Sanal makineler, her biri kendi işletim sistemini barındırdıkları için daha fazla kaynak (RAM, depolama) tüketirler.
+
+3-)Bağımlılıklar ve Ortam Yönetimi:
+
+Docker: Docker konteynerleri, uygulama ve bağımlılıkları bir araya getirir, bu da taşınabilir ve tekrar kullanılabilir uygulama paketleri oluşturmanın kolay olmasını sağlar.
+Sanal Makineler: Sanal makineler, genellikle tam işletim sistemleri içerir, bu da daha büyük dosya boyutlarına ve daha uzun başlatma sürelerine yol açabilir.
+
+4-)Bağlamalar ve İzolasyon:
+
+Docker: Docker, işletim sistemi seviyesinde izolasyon sağlar, ancak aynı çekirdek üzerinde çalıştıkları için tam anlamıyla izole değildir.
+Sanal Makineler: Sanal makineler, tam bir işletim sistemi içerdikleri için daha güçlü bir izolasyon sağlarlar.
+
+5-)Performans:
+
+Docker: Docker, hafif konteynerler ve paylaşılan çekirdek sayesinde genellikle daha hızlı başlatma süreleri ve daha düşük performans etkileri sağlar.
+Sanal Makineler: Sanal makineler, tam bir işletim sistemi barındırdıkları için başlatma süreleri daha uzun olabilir ve daha fazla kaynak tüketebilirler.
+
+Sonuç olarak, Docker konteynerleri genellikle daha hafif, hızlı başlatılabilir ve kaynak dostu olma eğilimindedir, ancak belirli senaryolarda sanal makineler daha güçlü izolasyon ve bağımsızlık sağlayabilir. Seçim, kullanım senaryonuza ve ihtiyaçlarınıza bağlı olacaktır.

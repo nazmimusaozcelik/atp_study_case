@@ -1,0 +1,45 @@
+variables: 
+    env: dev
+
+
+stages:
+  - stage: Build
+    displayName: CI Pipeline
+    pool:
+      name: "Build Agent Pool"
+    jobs:
+      - job: BuildImageJob
+        steps:
+         - task: Maven@4
+          displayName: Maven Build
+          inputs:
+            mavenPomFile: './pom.xml'
+            goals: 'clean install'
+            options: '-P  $(env) -Dmaven.test.skip=true -s ./maven-settings.xml'
+            publishJUnitResults: false
+            javaHomeOption: 'Path'
+            jdkVersionOption: '1.8'
+            jdkDirectory: '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-1.el7_9.x86_64'
+            mavenVersionOption: 'Path'
+            mavenDirectory: '/home/azure/apache-maven-3.6.3'
+            mavenOptions: '-Xms128m -Xmx1024m -XX:MaxPermSize=512m'
+            mavenAuthenticateFeed: false
+            effectivePomSkip: false
+            sonarQubeRunAnalysis: false
+            mavenSetM2Home: true
+
+        - task: Docker@2
+          displayName: Docker Build
+          inputs:
+            containerRegistry: 'Nexus'
+            repository: 'atp/testapp'
+            command: 'build'
+            Dockerfile: './Dockerfile'
+            tags: '$(env)'
+        - task: Docker@2
+          displayName: Docker Push
+          inputs:
+            containerRegistry: 'Nexus'
+            repository: 'atp/testapp'
+            command: 'push'
+            tags: '$(env)'

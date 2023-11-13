@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-configmap
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+      nodeSelector:
+        nginx: "true" # Bu satır, sadece "nginx=true" etiketine sahip node'larda çalışmasını sağlar

@@ -1,0 +1,147 @@
+1. MADDE
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  nginx.conf: |
+    # Buraya nginx.conf dosyanızın içeriğini ekleyin
+    
+$ kubectl create configmap nginx-configmap --from-file=nginx.conf=./nginx.conf
+$ kubectl apply -f nginx-configmap.yaml
+
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-configmap
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+
+
+ConfigMap'i NGINX pod'ında belirtilen bir yol altında monte etmek için kullanılır. configMap altındaki name özelliği, kullanılacak ConfigMap'in adını belirtir. items altındaki key ve path özellikleri, ConfigMap'teki belirli bir öğenin, NGINX pod'ında belirli bir yolda nereye monte edileceğini belirtir.
+
+Bu şekilde, NGINX pod'ınıza ConfigMap üzerinden NGINX konfigürasyonunu enjekte etmiş olursunuz.
+
+2. MADDE
+
+$ kubectl label nodes <node-name> app=true
+$ kubectl label nodes <node-name-for-nginx> nginx=true
+
+      nodeSelector:
+        nginx: "true"  # Bu satır, sadece "nginx=true" etiketine sahip node'larda çalışmasını sağlar
+
+3. MADDE
+
+$ kubectl apply -f mysql-pv.yaml
+$ kubectl apply -f mysql-pvc.yaml
+
+Bu PV ve PVC örnekleri, MySQL verilerini bir hostPath üzerinde depolayan basit bir yapıdır. Gerçek bir üretim ortamında, verilerinizi daha dayanıklı depolama
+çözümleriyle entegre etmeniz gerekebilir (örneğin, bir bulut sağlayıcısının diskleri, NFS, ya da başka bir depolama çözümü).
+
+PV ve PVC'ler arasındaki eşleşmeyi belirlemek için claimRef alanını kullanabilirsiniz. claimRef alanı, bir PVC'nin hangi PV'ye bağlı olduğunu gösterir.
+
+  claimRef:
+    namespace: default
+    name: mysql-data
+    uid: <UID-OF-MYSQL-DATA-PVC>
+
+Bu örnekte, claimRef alanı ile PVC'nin hangi PV'ye bağlı olduğunu belirtiyoruz. namespace, name, ve uid değerleri, bağlantıyı sağlar. Bu değerleri, 
+PVC'nin UID'si ile değiştirmeniz gerekiyor. PVC'nin UID'sini öğrenmek için şu komutu kullanabilirsiniz:
+
+$ kubectl get pvc mysql-data -o jsonpath='{.metadata.uid}'
+
+LONGHORN KULLANMAK İSTERSEK;
+
+Longhorn, Kubernetes üzerinde çalışan bir uzun ömürlü depolama sistemidir ve PV ve PVC'leri yönetmek için kullanılabilir. 
+Longhorn kullanarak PVC ve PV oluşturmak için aşağıdaki adımları izleyebilirsiniz.
+
+$ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml
+$ kubectl -n longhorn-system get pod
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn
+provisioner: driver.longhorn.io
+parameters:
+  size: 1Ti
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+
+4. MADDE
+
+1-) Replica Sayısı (replicas): Bu, uygulamanın kaç kopyasının çalışacağını belirtir. Uygulamanızın yüksek erişilebilirliğini ve dayanıklılığını etkiler. 
+Genellikle en az 2 ya da daha fazla olması önerilir.
+
+replicas: 3
+
+2-) Güncelleme Stratejisi (strategy): Varsayılan olarak, RollingUpdate stratejisi kullanılır.
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+maxSurge: Bir güncelleme sırasında izin verilen maksimum fazla replika sayısı.
+maxUnavailable: Bir güncelleme sırasında izin verilen maksimum kullanılamayan replika sayısı.
+
+3-) Öncelik Sırası (priorityClassName): Uygulamanızın öncelik seviyesini belirtir.
+
+priorityClassName: high-priority
+
+4-) Liveness ve Readiness Probe'lar (livenessProbe ve readinessProbe): Uygulamanızın canlı ve hazır olup olmadığını kontrol eden HTTP endpoint'leri, 
+TCP soketleri veya özel komutlar gibi belirli şartları tanımlar.
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /readiness
+    port: 8080
+
+5-) Özel Ortamlar ve ConfigMap'ler (env ve configMapRef): Uygulamanızın çeşitli ayarlarını yapılandırmak için ortam değişkenleri ve ConfigMap'ler kullanabilirsiniz.
+
+env:
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: my-secret
+        key: database-url
+
+
+5,6,7,8,9,10. MADDELER
+
+*.yaml ve nginx.conf dosyalarından takip edilebilir.
+
+
+
+DEPLOYMENT KOMUTLARI: 
+
+$ kubectl apply -f mysql-pv.yaml
+$ kubectl apply -f mysql-pvc.yaml
+$ kubectl apply -f nginx-configmap.yaml
+$ kubectl apply -f nginx-deployment.yaml
+$ kubectl apply -f nginx-service.yaml
+$ kubectl apply -f tomcat-a-deployment.yaml
+$ kubectl apply -f tomcat-b-deployment.yaml
+$ kubectl apply -f mysql-deployment.yaml
+$ kubectl apply -f redis-master-deployment.yaml
+$ kubectl apply -f redis-slave-deployment.yaml

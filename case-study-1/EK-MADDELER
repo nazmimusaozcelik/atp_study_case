@@ -1,0 +1,137 @@
+1. MADDE
+
+Docker Swarm ile bir Nginx servisini çalıştırırken Nginx yapılandırma dosyasını Docker config kullanarak alabilirsiniz. İşte bunu nasıl yapabileceğinizi gösteren bir örnek:
+
+Öncelikle, Nginx yapılandırma dosyasını bir Docker config nesnesi olarak oluşturmanız gerekecektir. Docker komutlarıyla bu işlemi aşağıdaki gibi gerçekleştirebilirsiniz:
+
+Nginx yapılandırma dosyasını bir konfigürasyon dosyası olarak oluşturun. Örneğin, "nginx.conf" adında bir dosya oluşturun.
+
+Docker config nesnesini oluşturun:
+
+$ docker config create my_nginx_config nginx.conf
+
+Bu örnekte, configs bölümü ile Nginx servisine my_nginx_config adında bir Docker config nesnesi ekledik. Bu config nesnesi, Nginx yapılandırma dosyasını /etc/nginx/nginx.conf yoluna monte eder. Bu sayede Nginx servisi Docker config nesnesi içindeki yapılandırmayı kullanacaktır.
+
+Docker Stack'i kullanarak bu stack.yaml dosyasını dağıttığınızda, Nginx servisi Docker config nesnesini kullanarak çalışacaktır. Yapılandırma dosyasını güncellediğinizde, servisi yeniden başlatmadan bu değişiklikler Nginx'e uygulanacaktır.
+
+$ docker config ls   --> ile oluştruduğumuz configi listeleyebiliriz.
+
+    configs:
+      - source: my_nginx_config
+        target: /etc/nginx/nginx.conf
+
+2. MADDE
+
+Docker Swarm ortamında belirli etiketlere sahip servisleri belirli düğümlerde çalıştırmak için constraints özelliğini kullanabilirsiniz. 
+Aşağıda, bir örnek Docker Compose dosyası verilmiştir.
+
+
+$ docker node ls --> ile node'lar listenebilir.
+
+$ docker node inspect --format '{{ .Spec.Labels }}' node_name  ---> herhangi bir node üzerindeki labelları listelemek için.
+
+
+Önce, Docker Swarm ortamınızda etiketlenmiş düğümleri oluşturmanız ve yönetici (manager) ve işçi (worker) rollerini uygun şekilde etiketlemeniz gerekir.
+
+Diyelim ki üç yönetici düğüm ve iki işçi düğümünüz var. Aşağıda bu düğümleri etiketlemek için kullanılabilecek örnek bir komut bulunmaktadır:
+
+# MANAGER NODE
+docker node update --label-add nginx=true manager1
+docker node update --label-add nginx=true manager2
+docker node update --label-add nginx=true manager3
+
+# WORKER NODE
+docker node update --label-add app=true worker1
+docker node update --label-add app=true worker2
+
+$ docker node inspect --format '{{ .Spec.Labels }}' manager1  ---> herhangi bir node üzerindeki labelları listelemek için.
+
+
+      placement:
+        constraints:
+          #- node.role == manager
+          - node.labels.nginx == true
+
+Servisi başlatmak için, Docker Swarm ortamında şu komutu kullanabilirsiniz:
+
+$ docker stack deploy -c docker-compose.yml myapp
+
+
+3. MADDE
+
+
+MySQL uygulamasında verilerin kalıcı olmasını sağlamak için Docker Swarm'da volume kullanabilirsiniz. 
+Böylece MySQL konteyneri her yeniden başladığında veya güncellendiğinde, veritabanı verileri kaybolmaz.
+
+
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+    driver: local
+
+$ docker volume create --name=mysql_data
+$ docker voluem list
+
+
+4. MADDE
+
+Docker Swarm'da servis dağıtımını yapılandırırken deploy bölümü içindeki çeşitli parametreleri belirlemek, uygulamanın performansı, ölçeklenebilirliği ve dayanıklılığı üzerinde önemli bir etkiye sahiptir.
+ İşte bu parametreler hakkında dikkate almanız gereken bazı önemli noktalar:
+
+1-) Replica Sayısı (replicas):
+
+Kaç adet kopya (replica) kullanmak istediğinize karar verin. Bu, uygulamanızın yüksek erişilebilirliğini sağlar ve iş yükünüzü paralel olarak işler.
+Ancak, çok sayıda replika kullanmak, kaynak tüketimini artırabilir. Fazla replica sayısı, gereksiz yere kaynakları kullanabilir ve gereksiz ağ trafiğine neden olabilir.
+
+2-) Dağıtım Modu (mode):
+
+Servisinizi nasıl dağıtmak istediğinize karar verin. Örneğin, global modu tüm düğümlerde çalışacak bir kopya oluştururken, replicated modu replicas sayısını belirterek çalışan kopya sayısını kontrol eder.
+Global mod, özellikle yönetici düğümleri arasında dolaşan işler veya hizmetler için uygundur. Replicated mod, ölçeklenebilir bir uygulama için daha uygundur.
+
+3-) Paralel Dağıtım (parallelism):
+
+Bir güncelleme sırasında eşzamanlı olarak kaç replikanın güncelleneceğini belirler.
+Çok büyük bir paralel dağıtım, kaynakları aniden kullanabilir ve ağ trafiğini artırabilir. Bu nedenle, dikkatlice seçilmelidir.
+
+4-) Güncelleme Sırası (update_config.order):
+
+Güncelleme işleminin belirli bir sıra ile yapılmasını sağlar. Örneğin, servis güncellemelerini sıralı bir şekilde uygulamak istiyorsanız, order özelliğini kullanabilirsiniz.
+
+5-) Güncelleme Paralelizmi (update_config.parallelism):
+
+Güncelleme sırasında eşzamanlı olarak kaç adet replikanın güncelleneceğini belirler.
+Yüksek bir paralelizm, güncellemelerin hızlı bir şekilde gerçekleşmesine yardımcı olabilir, ancak aynı zamanda kaynak tüketimini de artırabilir.
+
+6-) Yatay Ölçeklendirme (scale):
+
+Yatay ölçeklendirme, servisin çalıştığı replika sayısını dinamik olarak ayarlamak için kullanılabilir. Bu, iş yüküne dinamik bir şekilde yanıt verebilmenize olanak tanır.
+
+Bu değerlerin belirlenmesi, uygulamanızın gereksinimlerine, kullanım senaryolarına ve altyapınıza bağlıdır. Özellikle performans testleri yaparak ve sistem davranışını anlayarak bu parametreleri belirlemek önemlidir.
+Ayrıca, dağıtım güncellemeleri sırasında sıralama ve paralelizm değerlerini dikkatlice seçmek, kesinti süresini ve sistem stabilitesini etkileyebilir.
+
+
+5. MADDE
+
+Nginx konteynerinin 443 portunu host makinanın 443 portuna bağlamasını sağlar.
+
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+
+Bu şekilde, Nginx hem HTTP hem de HTTPS trafiği dinleyebilir ve gelen isteklere uygun şekilde yanıt verebilir.
+Unutmayın ki, HTTPS kullanabilmek için SSL/TLS sertifikalarınızın düzgün bir şekilde yapılandırılması ve yüklenmesi gerekebilir.
+
+
+6,7,8,9,10. MADDELER
+
+stack.yaml ve nginx.conf dosyalarından takip edilebilir.
+
+
+
+

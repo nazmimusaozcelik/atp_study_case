@@ -1,0 +1,62 @@
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 ~
+$ multipass launch --name master1
+Launched: master1
+
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 ~
+$ multipass launch --name master2
+Launched: master2
+
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 ~
+$ multipass launch --name master3
+Launched: master3
+
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 ~
+$ multipass launch --name worker1
+Launched: worker1
+
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 ~
+$ multipass launch --name worker2
+Launched: worker2
+
+
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 /
+$ multipass list
+Name                    State             IPv4             Image
+master1                 Running           172.25.159.247   Ubuntu 22.04 LTS
+master2                 Running           172.25.155.58    Ubuntu 22.04 LTS
+master3                 Running           172.25.154.146   Ubuntu 22.04 LTS
+worker1                 Running           172.25.150.229   Ubuntu 22.04 LTS
+worker2                 Running           172.25.148.249   Ubuntu 22.04 LTS
+
+
+nazmimusa.ozcelik@nazmimusa.ozcelik MINGW64 /
+$ multipass shell master1
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-87-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Tue Nov  7 18:36:10 +03 2023
+
+  System load:  0.208984375       Processes:             92
+  Usage of /:   30.3% of 4.67GB   Users logged in:       0
+  Memory usage: 22%               IPv4 address for eth0: 172.25.145.21
+  Swap usage:   0%
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+ubuntu@master1:~$

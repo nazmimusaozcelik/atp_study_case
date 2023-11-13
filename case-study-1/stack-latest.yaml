@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    configs:
+      - source: my_nginx_config
+        target: /etc/nginx/nginx.conf
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.nginx == true
+
+  tomcat_a:
+    image: tomcat:latest
+    environment:
+      - CATALINA_OPTS=-Dserver.port=8080
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.labels.app == true
+
+  tomcat_b:
+    image: tomcat:latest
+    environment:
+      - CATALINA_OPTS=-Dserver.port=8081
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.labels.app == true
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_DATABASE: your_database_name
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.app == true
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis_master:
+    image: redis:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.app == true
+
+  redis_slave:
+    image: redis:latest
+    command: redis-server --slaveof redis_master 6379
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.app == true
+
+configs:
+  my_nginx_config:
+    file: ./nginx.conf
+
+volumes:
+  mysql_data:
+    driver: local

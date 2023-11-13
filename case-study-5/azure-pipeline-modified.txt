@@ -1,0 +1,59 @@
+variables:
+  - name: branchName
+    value: $[ replace(variables['Build.SourceBranchName'], '/', '-') ]
+
+stages:
+- stage: Build
+  displayName: CI Pipeline
+  condition: and(succeeded(), in(variables['Build.SourceBranch'], 'refs/heads/dev', 'refs/heads/test', 'refs/heads/preprod'))
+  jobs:
+  - job: BuildImageJob
+    condition: or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/test'), eq(variables['Build.SourceBranch'], 'refs/heads/preprod'))
+    steps:
+    - task: Maven@4
+      displayName: Maven Build
+      inputs:
+        mavenPomFile: './pom.xml'
+        goals: 'clean install'
+        options: '-P $(variables.env) -Dmaven.test.skip=true -s ./maven-settings.xml'
+        publishJUnitResults: false
+        javaHomeOption: 'Path'
+        jdkVersionOption: '1.8'
+        jdkDirectory: '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-1.el7_9.x86_64'
+        mavenVersionOption: 'Path'
+        mavenDirectory: '/home/azure/apache-maven-3.6.3'
+        mavenOptions: '-Xms128m -Xmx1024m -XX:MaxPermSize=512m'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: false
+        mavenSetM2Home: true
+
+    - task: Docker@2
+      displayName: Docker Build
+      inputs:
+        containerRegistry: 'Nexus'
+        repository: 'atp/testapp'
+        command: 'build'
+        Dockerfile: './Dockerfile'
+        tags: '$(variables.env)-$(branchName)'
+      condition: and(succeeded(), eq(variables['parameters.deploy'], 'true'))
+
+    - task: Docker@2
+      displayName: Docker Push
+      inputs:
+        containerRegistry: 'Nexus'
+        repository: 'atp/testapp'
+        command: 'push'
+        tags: '$(variables.env)-$(branchName)'
+      condition: and(succeeded(), eq(variables['parameters.deploy'], 'true'))
+
+trigger:
+  branches:
+    include:
+      - dev
+      - test
+      - preprod
+  paths:
+    include:
+      - 'main/src/*'
+      - 'pom.xml'

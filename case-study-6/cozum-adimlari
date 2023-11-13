@@ -1,0 +1,39 @@
+1- Sorunu Anlama:
+
+Genel Müdür ile konuşarak sorunun ne olduğunu daha ayrıntılı anlamaya çalış. Hangi servis, sunucu veya uygulama etkileniyor?
+
+2- Logları İnceleme:
+
+Erişim sorunu yaşanan servis veya sunucuların log dosyalarını kontrol et. Hata mesajları, uyarılar veya isteğe bağlı bilgiler bu aşamada önemli olabilir.
+
+3- Monitöring Araçlarını Kullanma:
+
+Sistemlerde kullanılan monitöring araçlarını (örneğin, Prometheus, Grafana, Nagios) kullanarak anlık durumu kontrol et. CPU kullanımı, bellek kullanımı, ağ trafiği gibi metrikleri inceleyerek anormal durumları tespit etmeye çalış.
+
+4-Uygulama Kodunu İnceleme:
+
+Erişim sorunu yaşanan uygulamanın kodunu incele. Özellikle geçmiş değişiklikleri gözden geçirerek, son değişikliklerin soruna neden olup olmadığını kontrol et.
+
+5- Güncellemeleri Kontrol Etme:
+
+Uygulama veya sunucularda son güncellemeleri kontrol et. Eğer son bir güncelleme yapıldıysa, bu güncellemenin soruna neden olup olmadığını değerlendir.
+
+6-Yedekleme Geri Yükleme:
+
+Eğer mümkünse, sorun yaşanan sistemdeki son stabil duruma ait bir yedeği geri yükle ve sistemin çalışıp çalışmadığını kontrol et.
+
+7-Ekip İletişim Kurma:
+
+Uygulamadan sorumlu ekip veya sistem yöneticileriyle iletişime geçmeye çalış. Belki de bu kişilerden birisi acil durumlar için ulaşılabilir durumdadır.
+
+8-Çözüm Geliştirme:
+
+Sorunun nedenini tespit ettikten sonra, bir çözüm planı oluştur. Eğer hızlı bir çözüm mümkün değilse, geçici çözümlerle sistemi tekrar çalışır hale getir.
+
+9-Sorunu Çözme ve Takip:
+
+Uygulanan çözümü uygula ve sistemi kontrol et. Ardından, sorunun asıl nedenini ortadan kaldırmak için daha kalıcı bir çözüm üzerinde çalış.
+
+10- Dokümantasyon ve Raporlama:
+
+Sorunun tespiti, çözümü ve alınan önlemleri belgele. Bu, benzer sorunların tekrarlanması durumunda daha hızlı müdahale etmenize yardımcı olacaktır.

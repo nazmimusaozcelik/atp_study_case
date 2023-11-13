@@ -1,0 +1,65 @@
+Docker Swarm'dan Kubernetes'e geçiş yapmak, bir dizi adım içerir. İlk olarak, Kubernetes cluster'ınızı oluşturmanız ve konfigüre etmeniz gerekecek. 
+Ardından, her bir uygulama için Kubernetes manifest dosyaları oluşturup bu manifest dosyalarını kullanarak uygulamaları deploy etmelisiniz.
+
+İşte adım adım bir yaklaşım:
+
+1: Kubernetes Cluster Oluşturma
+
+1.1-) Kubernetes Cluster'ı Oluşturun:
+
+Kubernetes cluster'ınızı oluşturmak için bir Kubernetes dağıtımı seçmelisiniz. Örneğin, Minikube, kops (Kubernetes Operations), kubeadm, AKS (Azure Kubernetes Service), 
+EKS (Amazon Elastic Kubernetes Service) gibi araçlar kullanılabilir.
+
+2: Uygulama Manifest Dosyalarını Oluşturma
+
+2.1-) Nginx Uygulaması:
+
+Nginx uygulamasının deployment ve service manifest dosyalarını oluşturun. Deployment dosyasında konteyner konfigürasyonlarını, replica sayısını belirtin. 
+Service dosyasında da gerekli servis özelliklerini tanımlayın.
+
+2.2-) Tomcat A ve Tomcat B Uygulamaları:
+
+Her iki Tomcat uygulaması için ayrı deployment ve service manifest dosyalarını oluşturun. Deployment dosyalarında konteyner konfigürasyonlarını, replica sayılarını ve gerektiğinde özel ayarları belirtin.
+
+2.3-) MySQL ve Redis Uygulamaları:
+
+MySQL ve Redis uygulamaları için deployment ve service manifest dosyalarını oluşturun. MySQL için PVC (Persistent Volume Claim) kullanarak veri saklamayı unutmayın.
+
+3: ConfigMap ve Secret Kullanma
+
+3.1-) Nginx ConfigMap ve SSL Sertifikası:
+
+Nginx'in config dosyasını ConfigMap olarak tanımlayın. SSL sertifikası ve diğer gizli bilgileri Kubernetes Secret olarak saklayın.
+
+4: Etiketleme ve Yerleştirme
+
+4.1-) Etiketleme:
+
+Uygulamalarınızı çalıştırmak istediğiniz node'ları etiketleyin. Örneğin, Nginx için nginx=true, diğer uygulamalar için app=true etiketlerini kullanabilirsiniz.
+
+4.2-) Yerleştirme (Placement):
+
+Her uygulama için uygun yerleştirme kriterlerini belirtin. Örneğin, Nginx'i sadece nginx=true etiketli makinelerde çalıştırın, diğer uygulamaları app=true etiketli makinelerde çalıştırın.
+
+5: Deploy ve İzleme
+
+Uygulamaları Deploy Etme:
+
+$ kubectl apply -f <manifest-dosya> --> komutuyla her bir uygulamayı deploy edin.
+
+Durumu İzleme:
+
+$ kubectl get pods, 
+$kubectl get services --> gibi komutlarla uygulamalarınızın durumunu izleyin.
+
+6: Erişim Kontrolü
+
+6.1-) Nginx ile Erişim Kontrolü:
+
+Nginx ile ilgili olarak yapılandırılmış erişim kontrolü kurallarını Kubernetes ingress özelliğini kullanarak tanımlayın.
+
+7: SSL Redirect ve Path Yönlendirmesi
+
+7.1-) SSL Redirect ve Path Yönlendirmesi:
+
+Ingress kaynakları kullanarak SSL redirect ve path tabanlı yönlendirmeleri konfigüre edin.

@@ -1,0 +1,8 @@
+- condition özelliği ile pipeline'ın sadece belirli branch'lerde çalışmasını sağladık.
+- branchName adlı bir değişken oluşturduk ve bu değişkeni branch adını temsil etmesi için kullanıyoruz.
+- parameters bloğunu kullanarak, deploy parametresini kontrol etmek için bir parametre ekledik. Bu parametre true olduğunda Docker görevleri çalışacaktır.
+- variables.env değerini, branch adına göre dinamik olarak güncelliyoruz.
+- paths özelliği yalnızca belirli dosya veya dizinlerde değişiklik olduğunda pipeline'ın tetiklenmesini sağlar.
+
+!!! parameters ve variables.env değerlerini Azure DevOps web arayüzünde belirtmeliyiz. Bu, pipeline'ı manuel olarak tetiklediğinizde veya otomatik olarak tetiklendiğinde 
+bu değerlerin doğru bir şekilde alınmasını sağlar.

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-a-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tomcat-a
+  template:
+    metadata:
+      labels:
+        app: tomcat-a
+    spec:
+      containers:
+      - name: tomcat-a
+        image: tomcat:latest
+        env:
+        - name: CATALINA_OPTS
+          value: -Dserver.port=8080
+      nodeSelector:
+        app: "true"  # Bu satır, sadece "app=true" etiketine sahip node'larda çalışmasını sağlar

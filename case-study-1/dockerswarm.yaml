@@ -1,0 +1,136 @@
+Docker Swarm, fiziksel veya sanal sunucuların bir küme(cluster) halinde docker uygulamalarını yönetildiği orkestrasyon aracıdır.
+Docker swarm ile yoğun sunucu yüklerini istediğiniz şekilde dağıtan, bir sorun olması halinde sistemin sürekli çalışır halde kalmasını sağlayan bir alt yapı oluşturmamızı sağlar.
+
+Docker container’ların bir orchestration yardımı ile küme(cluster) içerisindeki nodelarda yönetilmesi ve bu işlemleri otomatize edilmesi büyük çaplı sistemlerin 
+yönetilebilmesini kolaylaştırmakta yüksek erişebilirlik (high availability) gibi kavramların uygulanabilmesine imkan tanımaktadır. Bu gibi konular için container’ların 
+yönetildiği ve orchestration edildiği bir çok çözüm mevcuttur. Bunlardan bir tanesi de docker swarmdır.
+
+Docker Swarm ile birlikte,
+
+Container Orchestrating (Container orkestrasyon)
+Ölçekleme (Scability)
+Güvenlik (Tls Connection)
+Yük Dağıtımı (Load Balancing)
+Dns Sunucusu (Service Discovery)
+Container Durum Yönetimi (Desired State Reconciliation) sağlar.
+
+
+Swarm bize sağladıkları,
+
+Swarm ile hangi container hangi makinede çalışacak belirleyebiliriz.
+Hangi container’dan kaç kopya(replica) çalışacak.
+Makinelerden biri düştüğünde onun çalıştırdığı container nerede tekrar ayağa kaldırılacak.
+High Availability (Yüksek kullanılabilirlik)
+Yük dağılımı (Load balancing) özelliklerini sağlar.
+
+Swarm için herhangi bir kurulum gerektirmez. Docker kurulumu yaptığımızda swarm mode inactive olarak yüklenir. Aşağıdaki komut ile baktığımızda,
+
+$ docker info
+$ docker swarm init
+$ docker swarm init --advertise-addr 192.168.0.27
+
+
+Swarmda makinelerin temel olarak iki rolü vardır.
+
+Manager role
+Worker role
+Swarmda temel olarak istediğiniz kadar worker node’unuz ve an az bir manager node’unuz olması gerekir. 
+Tek bir manager sadece test amaçlı kabul edilebilir çünkü tek managerlı bir sistem yüksek kullanılabilirlik (high availability) özelliğine sahip olmaz. 
+Manager node çökerse sistem sahipsiz kalır, mevcut çalışan görevler çalışmaya devam eder ama yeni nodelar ve görevler eklenemez veya çıkartılamaz. 
+Sistemin çalışmaya devam etmesi için en az 3 Manager node olması gerekir.
+
+Manager Node Nedir
+Adı üstünde swarm küme(cluster) üzerindeki işlerin yönetilmesini gerçekleştiren node grubudur. Servislerin yönetilmesi, ölçekleme, sürekli monitör ederek cluster 
+ortamını(cluster state) istenen seviyede tutma(desired state), servisler arası yük dağılımı(load balancing) gibi görevleri vardır.
+
+Not: Cluster içerisindeki manager node sayısı high availability açısından önemlidir.
+
+Bir manager’ın çökebilmesi ihtimaline karşı en optime çözüm en az 3 manager kullanılmasıdır. 5 manager varsa iki manager’ın çökme riskini elimine eder.
+
+N manager olan cluster içerisinde (N-1)/2 manager kaybını tolere edilebilir. (RAFT Konsensus)
+
+Not: Docker en fazla 7 manager önermektedir.
+
+Worker Node Nedir
+İşlerin yürüdüğü yani containerlarımızın çalıştığı node’lara verilen isimdir. Bir swarm cluster’da hiç worker node yokken de cluster tüm işlevini yerine getirebilir fakat sadece worker node olan bir cluster olamaz. 
+Bir worker node sonradan aşağıdaki kod ile manager yapılabilir.
+
+
+$ docker swarm promote node_ismi
+
+Manager node’lar kendi aralarında consensus(fikir birliği) sağlamak için RAFT algoritmasını kullanmaktadır. Manager’ların kendi aralarında ve worker’larla iletişim kurabilir fakat worker nodelar kendi aralarında iletişim kuramazlar.
+
+RAFT Algoritması (N-1) /2 Cluster ortamımızda 3 adet manager worker olduğunu düşünelim. (3–1)/2 = 1, yani 1 manager node down olsa bile cluster mimariniz bundan etkilenmez. Biraz da Raft konsensun nedir ona bakalım.
+
+
+RAFT Konsensus nedir
+Hata toleranslı dağıtık sistemlerdeki en temel sorun konsensusa varmaktır. Konsensus kısaca birden çok sunucunun bir değer konusunda karar vermesidir. Hangi değerin doğru olduğuna karar verdiklerinde o karar son karar olarak kabul edilir. Konsensus algoritmaları temel olarak sunucuların çoğunun ulaşılabilir durumda olmasını dayanır. Eğer çoğunluk yoksa sistem kitlenir ama hiç bir zaman yanlış bir cevap vermemiş olur.
+
+Örnek bir senaryo ile ele alalım.
+
+Örneğin 3 Manager Node’unuz var, lider node’unuz düştü, o anda sistemin görüntüsüne “A” diyelim. Diğer iki manager sistemi çalıştırmaya devam etti, sistemin durumu değişti, yeni görevler başlatıldı, çöken manager’da çalışan işler dağıtıldı. Yeni durumuz “B” olsun. Daha sonra çöken sunucu kendine geldi ve ona göre durum “A” ama çoğunluk “B” dediği için B’den devam edilir. Çünkü yeni devralınan işler çöken sunucuyla değil leader konumu alan “B” sunucusuyla devam etmiştir ve çalışan iki sunucuda yeni durum alınan “B” bilmektedir.
+
+Peki ya 2 yönetici olsaydı? Biri A derken, diğeri B diyecekti. Hangisini doğru kabul edecektik. İşte bu nedenle hata toleranslı bir sistem oluşturmak için en az 3 manager node’umuz olması gerekir.
+
+Özetle hata toleransı açısından baktığımızda tek sayılarda manager node olması yeterli.
+
+Manager node’larımız tek sayıda olacak
+N node’dan oluşan bir swarm en fazla (N-1)/2 adet manager node’un çökmesini tolere edebilir.
+
+
+$ docker swarm
+$ docker swarm init — advertiese-addr ip_adresi
+
+komutu ile nodemuzu manager node olarak atayabiliriz. Ayrıca istersek node gelen istekleri dinlemek için aşağıdaki parametreyi ekleyebiliriz. İsteğe bağlıdır zorunluluğu yoktur.
+
+$ ….. — listen-addr ip_adresi
+
+Aşağıdaki komut ile eklenecek yeni nodenun rolünü belirtebiliriz.
+
+$ docker swarm join-token manager | worker
+
+Nodemuzu swarm a dahil etmek için aşağıdaki komutu kullanılırız.
+
+$ docker swarm join — token token_id ve manager_ip_adresi: port_numarası
+
+$ docker swarm update
+Komutu ile swarm özellikleri değiştirebiliriz.
+
+$ docker node
+komutu ile node ile ilgili bilgilere ulaşabileceğimiz komut listesi görebiliriz.
+
+$ docker node promote node_ismi
+ile worker olan bir nodemuzu manager node olarak güncelleyebiliriz.
+
+$ docker node update avability pause node_ismi
+komutu ile çalışan nodemuzu durdurabiliriz. Avability 3 tip değer aldığı aşağıdaki şekilde gösterilmiştir.
+
+$ docker node update avability --help   ---> active pause drain
+
+$ docker node ls
+Komutu ile node üzerindeki master ve worker nodeların listesini görebiliriz.
+
+$ docker node ps
+komutu ile docker üzerinde çalışan containerları listeleriz.
+
+$ docker swarm leave
+komutu ile node a olan bağlılığımızı sonlandırabiliriz.
+
+
+docker info
+docker swarm init
+docker node ls
+
+Ayrıca docker network ls komutu ile birlikte docker networkler arasında swarm için özel bir overlay network ’un kurulduğunu görmekteyiz. 
+Bu oluşan overlay network aynı swarm cluster’ına dahil tüm containerların iletişim kurması için oluşturulan default bir networktür.
+
+$ docker network ls 
+
+docker service create <image_ismi> komutu cluster yapımızın içinde kullandığımız containerları ayaklandırmak için kullanılır.
+Service kelimesi bizim için içinde bulunan containera ait bir adet iş parçacığını simgelemektedir.
+
+$ docker service create busybox ping 8.8.8.8
+
+Oluşturduğumuz servisleri listelemek için
+
+$ docker service ls

@@ -1,0 +1,33 @@
+Docker ve Kubernetes, konteyner teknolojisi ve konteyner yönetimi açısından birbirinden farklı iki kavramdır. İşte Docker ve Kubernetes arasındaki temel farklar:
+
+1-) İşlev:
+
+Docker: Docker, konteyner teknolojisinin temelini oluşturan bir platformdur. Konteynerlerin oluşturulması, dağıtılması ve çalıştırılması için araçlar ve altyapı sağlar.
+Kubernetes: Kubernetes (k8s), konteyner uygulamalarını otomatikleştirmek, yönetmek ve genişletmek için tasarlanmış bir açık kaynak konteyner orkestrasyon sistemidir. Birden çok konteyner uygulamasını yönetmek, dengelemek ve ölçeklendirmek için kullanılır.
+
+2-) Yönetim Seviyesi:
+
+Docker: Docker, konteynerleri yönetmek için araçlar ve API'lar sağlayan bir konteyner platformudur. Ancak, çoklu konteyner uygulamalarını koordine etme ve orkestrasyon konularında kısıtlıdır.
+Kubernetes: Kubernetes, konteyner orkestrasyonu odaklı bir sistemdir. Birden çok konteyneri otomatikleştirilmiş bir şekilde yönetir, dengeler, ölçeklendirir ve bakımını yapar.
+
+3-)Orkestrasyon ve Otomatizasyon:
+
+Docker: Docker Swarm gibi bazı özellikleri içerir ancak orkestrasyon yetenekleri Kubernetes kadar geniş değildir.
+Kubernetes: Kubernetes, çoklu konteyner uygulamalarını otomatikleştirmek ve yönetmek için gelişmiş orkestrasyon yeteneklerine sahiptir. Ölçeklendirme, hata toleransı, güncelleme ve kaynak yönetimi gibi özellikleri içerir.
+
+4-)Uygulama Bildirimi:
+
+Docker: Docker Compose gibi araçlarla çoklu konteyner uygulamalarının basitleştirilmiş tanımlamalarını sağlar.
+Kubernetes: YAML dosyaları kullanarak karmaşık çoklu konteyner uygulamalarını tanımlama ve bildirme yeteneği sağlar.
+
+5-) Topluluk ve Ekosistem:
+
+Docker: Docker, geniş bir kullanıcı tabanına sahiptir ve popüler bir konteyner platformudur.
+Kubernetes: Kubernetes, çok büyük bir açık kaynak topluluğuna sahiptir ve endüstri standardı olarak kabul edilmiştir. Çeşitli bulut sağlayıcılar ve araçlar tarafından desteklenir.
+
+6-) Çalışma Ortamı:
+
+Docker: Docker, tek bir bilgisayar veya sunucu üzerinde çalışabilir.
+Kubernetes: Kubernetes, çoklu sunucu kümesi (cluster) üzerinde çalışır ve bu kümedeki kaynakları etkin bir şekilde yönetir.
+
+Sonuç olarak, Docker ve Kubernetes farklı seviyelerde hizmet sunarlar. Docker, tek bir bilgisayar veya sunucu üzerinde konteynerlerin oluşturulması ve çalıştırılması için bir platform sağlarken, Kubernetes çoklu konteyner uygulamalarının orkestrasyonu ve yönetimi için tasarlanmış bir sistemdir. Çoğu durumda, büyük ve karmaşık uygulamaların yönetimi için Kubernetes tercih edilir.

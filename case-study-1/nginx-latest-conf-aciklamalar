@@ -1,0 +1,64 @@
+SSL redirect, HTTP isteklerini HTTPS'e yönlendirmek anlamına gelir. Bu, kullanıcıların sitenize HTTP yerine güvenli (şifreli) bir bağlantı kullanarak erişmelerini 
+sağlamak için kullanılır. SSL/TLS, veri iletimini şifrelemek ve güvenli bir bağlantı sağlamak için kullanılır.
+
+İşte nginx.conf dosyasındaki ana özelliklerin açıklamaları:
+
+1-) listen ve server_name Blokları:
+İki farklı port (80 ve 443) için server blokları bulunmaktadır.
+80 numaralı port, HTTP trafiği dinler ve HTTPS'e yönlendirme yapar.
+443 numaralı port, HTTPS trafiği dinler ve gelen isteklere göre yönlendirme yapar.
+
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+
+Bu bölüm, 80 numaralı port üzerinde gelen tüm HTTP isteklerini HTTPS'e yönlendirir. return 301 ifadesi, 301 HTTP durum kodu ile bir yönlendirme yapılacağını belirtir.
+
+server {
+    listen 443 ssl;
+    server_name localhost;
+
+    ssl_certificate /etc/nginx/certs/nginx.crt;
+    ssl_certificate_key /etc/nginx/certs/nginx.key;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384';
+
+    location / {
+        proxy_pass http://tomcat_a;
+    }
+
+    location /pathA/ {
+        proxy_pass http://tomcat_a;
+    }
+
+    location /pathB/ {
+        proxy_pass http://tomcat_b;
+    }
+
+    location /mysql/ {
+        proxy_pass http://mysql;
+    }
+
+    location /redis/ {
+        proxy_pass http://redis_master;
+    }
+}
+
+
+1-) ssl Bloğu:
+
+listen 443 ssl; ifadesi, 443 numaralı port üzerinde SSL/TLS trafiği dinlenir.
+SSL/TLS sertifikalarının yolu (ssl_certificate ve ssl_certificate_key) belirtilir.
+ssl_protocols ve ssl_ciphers ifadeleri, güvenli iletişimi sağlamak için kullanılan protokoller ve şifreleme algoritmalarını belirtir.
+
+2-) location Blokları:
+
+Farklı URL yollarına göre yapılan yönlendirmeleri içerir.
+/, /pathA/, /pathB/, /mysql/, /redis/ gibi farklı istek yollarına gelen trafiği belirli uygulamalara (tomcat_a, tomcat_b, mysql, redis_master) yönlendirir.
+Bu konfigürasyon, Nginx'in SSL/TLS trafiği dinleyip, gelen isteklere göre farklı alt uygulamalara yönlendirme yapmasını sağlar. Ayrıca, HTTP trafiğini HTTPS'e yönlendirme yaparak güvenli bir bağlantı sağlar.
