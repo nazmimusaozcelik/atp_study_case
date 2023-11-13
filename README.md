@@ -43,3 +43,29 @@ Bu patlamış olan proje ile ilgili her sunucuya,servise vs erişimin var fakat 
 Ne yaparsın?
 Hangi adımları takip edersin?
 Sorunu nasıl çözmeye çalışırsın?
+
+####################################################################################################################################################################################################
+
+                                                                                     ///KLASOR ACIKLAMALARI///
+
+-- CASE-STUDY-1
+
+EK-MADDELER ---> EK MADDELERIN NASIL GERÇEKLENDIGI
+dockerswarm.yaml  ---> DOCKER SWARMA GENEL BAKIS
+multipasswithcreateubuntuserver.yaml ---> DOCKER SWARM CLUSTER ICIN UBUTU SERVER KURULUMU
+nginx-latest-conf-aciklamalar ---> NGINX DOSYASI ACIKLAMASI
+nginx-latest.conf  ---> NGINX CONF DOSYASI
+stack-latest.yaml  ---> SERVICE YAML DOSYASI
+
+-- CASE-STUDY-4
+
+EK-MADDELER ---> EK MADDELERIN NASIL GERÇEKLENDIGI
+Deployment, sevice , storageclass yaml dosylarını içerir.
+
+-- CASE-STUDY-5
+
+azure-pipeline-modified.txt ---> Pipeli'nin update edilmiş hali.
+dort-madde ---> istenilen maddelerin açıklanması
+
+
+
