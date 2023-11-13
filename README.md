@@ -46,7 +46,7 @@ Sorunu nasıl çözmeye çalışırsın?
 
 ###########################################################################################################
 
-                                                                      ///KLASOR ACIKLAMALARI///
+                                                                KLASOR ACIKLAMALARI
 
 -- CASE-STUDY-1
 
